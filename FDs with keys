@@ -1,1 +1,14 @@
-
+Diagnos_ID -> description
+Disease_name -> description
+Doctor_ID -> name , surname , age , gender , home_address , phone_number , ward_ID , Job_ID , Schedule-ID
+Drugs_name -> price , company , description
+Patient_ID , Date_of_come -> date_of_out
+Job_Type -> Title , Salary
+Nurse_ID -> name , surname , age , gender , home_address , phone_number , room_ID , Job_Type, Schedule-ID , ward_ID
+Patient_ID -> date_of_arrived
+Patient_ID ->  name , surname , age , gender , home_address , phone_number
+Room_ID -> ward_ID , num_of_beds
+Schedule_ID -> day , time_start , time_end
+Student_Nurse_ID -> Year_of_study , Year_of_graduate , University
+Treatment_ID -> Diagnos_ID , Drugs_name
+Ward_ID -> Ward_name  , total of rooms , block
