@@ -1,0 +1,41 @@
+1) π patient_id diagnos ∩
+ π patient_id patients
+
+2)π inpatient . patient_id, wards . ward_id, inpatient . room_id, inpatient . date_of_come, inpatient . date_of_out, operation . diagnos_id, operation . operation_name, operation . date, diagnos . discription, diagnos . doctor_id
+ σ operation . diagnos_id = diagnos . diagnos_id AND inpatient . patient_id = diagnos . patient_id AND wards . ward_id = rooms . ward_id AND rooms . room_id = inpatient . room_id (inpatient × operation × diagnos × rooms × wards)
+
+3)π jobs . job_type
+ σ jobs . salary > 200000 jobs ∖
+  π nurse . job_type nurse
+
+4)π doctors . doctor_id, doctors . name, doctors . surname, patients . patient_id, patients . name, patients . surname, diagnos . diagnos_id, diagnos . discription
+ σ patients . patient_id = diagnos . diagnos_id AND doctors . doctor_id = diagnos . doctor_id AND patients . patient_id = 3 (doctors × patients × diagnos)
+
+5)π wards . ward_id, wards . ward_name, COUNT (doctor_id)
+ γ COUNT (doctor_id)
+  σ wards . ward_id = doctors . ward_id AND wards . ward_id = 5 (doctors × wards)
+
+6)π wards . ward_id, wards . ward_name, COUNT (*)
+ γ ward_name, COUNT (*)
+  σ wards . ward_id = doctors . ward_id (wards × doctors)
+
+7)π patients . patient_id, patients . name, patients . surname, treat_normalization . treatment_id, treatment . diagnos_id, drugs . drugs_name, drugs . price, drugs . company
+ σ treatment . treatment_id = treat_normalization . treatment_id AND treat_normalization . patient_id = patients . patient_id AND treat_normalization . doctor_id = doctors . doctor_id AND treatment . drugs_name = drugs . drugs_name AND doctors . doctor_id = 35 (patients × treat_normalization × treatment × drugs × doctors)
+
+8)π patients . patient_id, medical_records . diagnos_id, medical_records . doctor_id, medical_records . treatment_id, medical_records . disease_name (patients ⋈ patients . patient_id = medical_records . patient_id medical_records)
+
+9)τ doctors . doctor_id (doctors ⋈ doctors . shedule_id = shedule . shedule_id shedule)
+
+11)π treatment . drugs_name treatment ∪
+ π drugs . drugs_name drugs
+
+12)π wards . ward_id, wards . ward_name, COUNT (*)
+ γ ward_id, COUNT (*)
+  σ wards . ward_id = rooms . ward_id AND rooms . room_id = inpatient . patient_id (wards × inpatient × rooms)
+
+13)π AVG (age)
+ γ AVG (age) patients
+
+15)τ nurse . nurse_id (nurse ⋈ nurse . shedule_id = shedule . shedule_id shedule)
+
+16)τ doctors . doctor_id (doctors ⋈ doctors . shedule_id = shedule . shedule_id AND shedule . day LIKE "%Tu%" shedule)
