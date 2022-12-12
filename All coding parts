@@ -1,1 +1,110 @@
+//QUERIES
 
+1)(select patient_ID from diagnos) 
+  intersect
+  (SELECT patient_ID FROM patients)  
+
+2)select inpatient.Patient_ID,wards.Ward_ID, inpatient.Room_ID, inpatient.Date_of_come, inpatient.Date_of_out, operation.Diagnos_ID, operation.Operation_Name, operation.Date, diagnos.Discription, Diagnos.Doctor_ID 
+from inpatient, operation, diagnos,rooms , wards 
+WHERE operation.Diagnos_ID = diagnos.Diagnos_ID && inpatient.Patient_ID = diagnos.Patient_ID && wards.Ward_ID = rooms.Ward_ID && rooms.Room_ID = inpatient.Room_ID;
+
+3)(SELECT jobs.Job_Type FROM jobs WHERE jobs.Salary > 200000)  
+  except  
+  (SELECT nurse.Job_Type FROM nurse);
+
+4)SELECT doctors.Doctor_ID , doctors.Name , doctors.Surname , patients.Patient_ID,patients.Name, patients.Surname, diagnos.Diagnos_ID, diagnos.Discription FROM
+  doctors, patients, diagnos WHERE patients.Patient_ID = diagnos.Diagnos_ID && doctors.Doctor_ID = diagnos.Doctor_ID && patients.Patient_ID = 3;
+
+5)select wards.Ward_ID , wards.Ward_Name , COUNT(doctors.Doctor_ID) FROM doctors, wards  
+  WHERE wards.Ward_ID = doctors.Ward_ID && wards.Ward_ID = 5;
+
+6)select wards.Ward_ID, wards.Ward_Name, COUNT(*)
+  from wards, doctors WHERE wards.Ward_ID = doctors.Ward_ID GROUP BY Ward_Name;
+
+7)SELECT patients.Patient_ID , patients.Name, patients.Surname, treat_normalization.Treatment_ID,treatment.Diagnos_ID, drugs.Drugs_name, drugs.Price,drugs.Company FROM patients, treat_normalization, treatment, drugs,doctors WHERE treatment.Treatment_ID = treat_normalization.Treatment_ID 
+&& treat_normalization.Patient_ID = patients.Patient_ID && treat_normalization.Doctor_ID = doctors.Doctor_ID && treatment.Drugs_name = drugs.Drugs_name && doctors.Doctor_ID = 35;
+
+8)SELECT patients.Patient_ID, medical_records.Diagnos_ID, medical_records.Doctor_ID, medical_records.Treatment_ID, medical_records.Disease_Name 
+FROM patients INNER JOIN medical_records ON patients.Patient_ID = medical_records.Patient_ID;
+
+9)SELECT * 
+  FROM doctors INNER JOIN shedule ON doctors.Shedule_ID = shedule.Shedule_ID
+  ORDER BY doctors.Doctor_ID;
+  
+ 10)SELECT*
+    FROM patients
+    WHERE EXISTS (SELECT medical_records.Patient_ID FROM medical_records WHERE patients.Patient_ID = medical_records.Patient_ID);
+ 
+11)(SELECT treatment.Drugs_name FROM treatment)
+   UNION
+   (SELECT drugs.Drugs_name FROM drugs);
+   
+12) select wards.Ward_ID, wards.Ward_Name, COUNT(*)
+      from wards, inpatient, rooms WHERE wards.Ward_ID = rooms.Ward_ID && rooms.Room_ID = inpatient.Patient_ID GROUP BY Ward_ID;
+      
+13) SELECT AVG(patients.Age) FROM patients;
+
+14)SELECT * FROM patients 
+   WHERE patients.Age < (SELECT AVG(patients.Age) FROM patients)  
+   ORDER BY `patients`.`Patient_ID` ASC;
+   
+15) SELECT * 
+      FROM nurse INNER JOIN shedule ON nurse.Shedule_ID = shedule.Shedule_ID
+      ORDER BY nurse.Nurse_ID;
+16) SELECT * FROM doctors INNER JOIN shedule ON doctors.Shedule_ID = shedule.Shedule_ID && shedule.Day LIKE '%Tu%' ORDER BY doctors.Doctor_ID;
+
+
+//TRIGGERS
+
+DELIMITER $$
+
+CREATE TRIGGER patient_archive BEFORE DELETE ON patients
+ FOR EACH ROW BEGIN
+ 
+    SET @DOC_ID := (Select doctor_ID FROM diagnos WHERE diagnos.Patient_ID = old.Patient_ID);
+    SET @DAG_ID := (Select diagnos_ID FROM diagnos WHERE diagnos.Patient_ID = old.Patient_ID);
+    set @idx := (SELECT MAX(archive_ID) FROM archive);
+    
+    INSERT INTO archive VALUES(COALESCE(@idx, 0)+1, old.patient_id, old.name, old.surname, old.age, old.gender, old.home_address, old.phone_number, COALESCE(@DOC_ID, 0), COALESCE(@DAG_ID, 0));
+END $$
+
+DELIMITER ;;
+
+
+
+
+DELIMITER $$
+
+CREATE TRIGGER patient_bed AFTER INSERT ON inpatient
+ FOR EACH ROW BEGIN
+  
+    set @bed := (SELECT number_of_beds from rooms WHERE rooms.Room_ID = new.Room_ID);
+    
+    UPDATE rooms set number_of_beds = @bed-1 WHERE rooms.Room_ID = new.Room_ID;
+
+END $$
+DELIMITER ;;
+
+
+//TRANSACTION
+
+START TRANSACTION; 
+    INSERT INTO patients VALUES(102 , 'Callie' , 'Stovold' , 18 ,'Female' , '743 Truax Street' , '+7 (463) 599-9466)'); 
+        INSERT INTO DISEASE VALUES('Anemy' , 'Weak people'); 
+        INSERT INTO DIAGNOS VALUES(102 , 'Tagy da bir narse dedin' , 34 , 102); 
+        INSERT INTO DRUGS VALUES('Qoidyn maiy' , 99990 , 'Home29' , 'Best description'); 
+        INSERT INTO TREATMENT VALUES(102 , 102 , 'Qoidyn maiy'); 
+        INSERT INTO medical_records VALUES (34 , 102 , 102 , 102 , 'Anemy'); 
+COMMIT; 
+
+//VIEW
+
+CREATE VIEW busy_rooms as 
+SELECT rooms.Room_ID, rooms.Ward_ID FROM rooms, inpatient, wards  
+WHERE wards.Ward_ID = rooms.Ward_ID && rooms.Room_ID = inpatient.Room_ID; 
+
+//INDEXES
+
+CREATE INDEX patientname ON Patient(patient_id , name , surname); 
+CREATE INDEX doctorname ON Doctor(doctor_id); 
+CREATE INDEX diseasename ON disease(disease_name);
