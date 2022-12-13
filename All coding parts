@@ -52,7 +52,7 @@ FROM patients INNER JOIN medical_records ON patients.Patient_ID = medical_record
       FROM nurse INNER JOIN shedule ON nurse.Shedule_ID = shedule.Shedule_ID
       ORDER BY nurse.Nurse_ID;
 16) SELECT * FROM doctors INNER JOIN shedule ON doctors.Shedule_ID = shedule.Shedule_ID && shedule.Day LIKE '%Tu%' ORDER BY doctors.Doctor_ID;
-
+17) SELECT medical_records.Disease_Name , COUNT(*) FROM medical_records GROUP BY medical_records.Disease_Name;
 
 //TRIGGERS
 
