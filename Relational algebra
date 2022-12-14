@@ -39,3 +39,5 @@
 15)τ nurse . nurse_id (nurse ⋈ nurse . shedule_id = shedule . shedule_id shedule)
 
 16)τ doctors . doctor_id (doctors ⋈ doctors . shedule_id = shedule . shedule_id AND shedule . day LIKE "%Tu%" shedule)
+
+
